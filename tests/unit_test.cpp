@@ -3,11 +3,16 @@
 #include <vector>
 #include <string>
 #include <unordered_set>
+#include <future>
+#include <chrono>
+#include <random>
+
 
 #include "Models/Movie.h"
 #include "Models/Seat.h"
 #include "Models/Theater.h"
 #include "Models/BookingService.h"
+ 
 
 // ---- Movie Tests ----
 TEST(MovieTest, ConstructorAndGetters) {
@@ -145,4 +150,118 @@ TEST(BookingServiceTest, BookSeatsSuccessAndFailure) {
     // Booking non-existent seat
     EXPECT_FALSE(svc.book_seats(30, 1, {"a21"}));
 }
+
+// ---- Concurrency and Thread Safety Tests ----
+
+TEST(SeatTest, ConcurrentBookingRaceCondition) {
+    Seat seat("a1");
+    const int num_threads = 10;
+    std::vector<std::future<bool>> futures;
+    
+    // Launch multiple threads trying to book the same seat
+    for (int i = 0; i < num_threads; ++i) {
+        futures.push_back(std::async(std::launch::async, [&seat]() {
+            return seat.book();
+        }));
+    }
+    
+    // Collect results
+    int successful_bookings = 0;
+    for (auto& future : futures) {
+        if (future.get()) {
+            successful_bookings++;
+        }
+    }
+    
+    // Only one thread should succeed
+    EXPECT_EQ(successful_bookings, 1);
+    EXPECT_FALSE(seat.is_available());
+}
+
+TEST(TheaterTest, ConcurrentSeatBookingStressTest) {
+    Theater theater(1, "Stress Test Cinema");
+    Movie movie(1, "Concurrent Movie");
+    theater.add_movie(movie);
+    
+    const int num_threads = 20;
+    const int seats_per_thread = 1;
+    std::vector<std::future<bool>> futures;
+    std::atomic<int> successful_bookings{0};
+    
+    // Each thread tries to book different seats
+    for (int i = 0; i < num_threads; ++i) {
+        futures.push_back(std::async(std::launch::async, [&theater, &movie, i, &successful_bookings]() {
+            std::vector<std::string> seats_to_book = {"a" + std::to_string(i + 1)};
+            bool success = theater.book_seats(movie.get_id(), seats_to_book);
+            if (success) successful_bookings++;
+            return success;
+        }));
+    }
+    
+    // Wait for all threads
+    for (auto& future : futures) {
+        future.wait();
+    }
+    
+    EXPECT_EQ(successful_bookings.load(), num_threads);
+    auto available_seats = theater.get_available_seats(movie.get_id());
+    EXPECT_EQ(available_seats.size(), 20 - num_threads);
+}
+
+TEST(TheaterTest, ConcurrentSameSeatBookingConflict) {
+    Theater theater(2, "Conflict Test Cinema");
+    Movie movie(2, "Conflict Movie");
+    theater.add_movie(movie);
+    
+    const int num_threads = 50;
+    std::vector<std::future<bool>> futures;
+    
+    // All threads try to book the same seat
+    for (int i = 0; i < num_threads; ++i) {
+        futures.push_back(std::async(std::launch::async, [&theater, &movie]() {
+            return theater.book_seats(movie.get_id(), {"a1"});
+        }));
+    }
+    
+    int successful_bookings = 0;
+    for (auto& future : futures) {
+        if (future.get()) {
+            successful_bookings++;
+        }
+    }
+    
+    // Only one thread should succeed
+    EXPECT_EQ(successful_bookings, 1);
+}
+
+TEST(BookingServiceTest, ConcurrentServiceOperations) {
+    BookingService service;
+    Movie movie(1, "Service Test Movie");
+    service.add_movie(movie);
+    
+    auto theater = std::make_shared<Theater>(1, "Service Test Theater");
+    theater->add_movie(movie);
+    service.add_theater(theater);
+    
+    const int num_threads = 30;
+    std::vector<std::future<bool>> futures;
+    std::atomic<int> successful_bookings{0};
+    
+    // Multiple threads booking different seats through the service
+    for (int i = 0; i < num_threads && i < 20; ++i) {
+        futures.push_back(std::async(std::launch::async, [&service, i, &successful_bookings]() {
+            std::vector<std::string> seats = {"a" + std::to_string(i + 1)};
+            bool success = service.book_seats(1, 1, seats);
+            if (success) successful_bookings++;
+            return success;
+        }));
+    }
+    
+    for (auto& future : futures) {
+        future.wait();
+    }
+    
+    EXPECT_EQ(successful_bookings.load(), std::min(num_threads, 20));
+}
+
 
