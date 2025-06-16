@@ -23,6 +23,7 @@ public:
 
 private:
   int id_;
+  int seats_per_row;
   int seat_count_ = 20;
   std::string name_;
   std::vector<Movie> movies_;
