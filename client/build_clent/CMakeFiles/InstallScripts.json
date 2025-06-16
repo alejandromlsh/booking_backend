@@ -1,0 +1,7 @@
+{
+	"InstallScripts" : 
+	[
+		"/home/alejandro/workspace/beamtrail_task/client/build_clent/cmake_install.cmake"
+	],
+	"Parallel" : false
+}

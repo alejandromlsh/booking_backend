@@ -1,0 +1,3 @@
+/home/alejandro/workspace/beamtrail_task/client/build_clent/CMakeFiles/movie_booking_client.dir
+/home/alejandro/workspace/beamtrail_task/client/build_clent/CMakeFiles/edit_cache.dir
+/home/alejandro/workspace/beamtrail_task/client/build_clent/CMakeFiles/rebuild_cache.dir
