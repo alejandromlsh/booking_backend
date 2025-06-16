@@ -2,3 +2,5 @@ boost/
 cmake/
 build/
 .vscode/
+client/build_clent/*
+
