@@ -35,6 +35,7 @@ int main() {
     service.add_theater(t2);
 
     boost::asio::io_context io_context;
+    //std::size_t thread_pool_size = std::thread::hardware_concurrency();
     std::cout << "Creating TCP server..." << std::endl;
     TcpServer server(io_context, 12345, service, std::thread::hardware_concurrency());
 
