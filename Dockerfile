@@ -35,8 +35,8 @@ RUN (wget https://archives.boost.io/release/1.85.0/source/boost_1_85_0.tar.gz ||
     cd .. && \
     rm -rf boost_1_85_0 boost_1_85_0.tar.gz
 
-# Install GoogleTest
-RUN git clone --depth 1 --branch release-1.14.0 https://github.com/google/googletest.git && \
+# Install GoogleTest with correct tag
+RUN git clone --depth 1 --branch v1.14.0 https://github.com/google/googletest.git && \
     cd googletest && \
     mkdir build && \
     cd build && \
