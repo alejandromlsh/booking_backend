@@ -5,8 +5,6 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Set Boost paths
-set(BOOST_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/../boost/boost_1_85_0")
-set(BOOST_LIBRARYDIR "${CMAKE_CURRENT_SOURCE_DIR}/../boost/boost_1_85_0/stage/lib")
 find_package(Boost 1.85 REQUIRED COMPONENTS json system thread)
 find_package(Threads REQUIRED)
 
