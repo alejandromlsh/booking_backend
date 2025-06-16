@@ -247,7 +247,7 @@ TEST_F(TcpServerFunctionalTest, ConcurrentBookingSameSeat) {
                 std::this_thread::sleep_for(std::chrono::microseconds(10));
             }
             
-            json::array seats = {"a10"};
+            json::array seats = {"c3"};
             json::value req = {{"command", "BOOK"}, {"theater_id", 1}, {"movie_id", 1}, {"seats", seats}};
             return send_and_receive_json(req, 2000);
         }));
@@ -300,7 +300,9 @@ TEST_F(TcpServerFunctionalTest, ConcurrentBookingDifferentSeats) {
                 std::this_thread::sleep_for(std::chrono::microseconds(10));
             }
             
-            // Use seats a11-a15 (all within valid range a1-a20)
+            // Generate valid seat IDs for sqrt(20) = 5 seats per row
+            char row = 'a' + (i / 5);
+            int seat = (i % 5) + 1; 
             json::array seats = {"a" + std::to_string(11 + i)};
             json::value req = {{"command", "BOOK"}, {"theater_id", 1}, {"movie_id", 1}, {"seats", seats}};
             return send_and_receive_json(req, 2000);
@@ -353,7 +355,7 @@ TEST_F(TcpServerFunctionalTest, CompleteBookingWorkflow) {
     EXPECT_EQ(seats_resp.at("available_seats").as_array().size(), 20);
     
     // 4. Book seats
-    json::array seats = {"a16", "a17"};
+    json::array seats = {"d3", "d4"};
     json::value book_req = {{"command", "BOOK"}, {"theater_id", 1}, {"movie_id", 1}, {"seats", seats}};
     auto book_resp = send_and_receive_json(book_req);
     EXPECT_EQ(book_resp.at("status").as_string(), "BOOKED");
