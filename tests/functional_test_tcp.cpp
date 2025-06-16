@@ -1,3 +1,13 @@
+/**
+ * @file functional_test_tcp.cpp
+ * @brief Comprehensive functional tests for the TCP Server and Movie Booking System
+ * @details This file contains integration and functional tests that validate the complete
+ *          movie booking system through its TCP server interface. Tests cover JSON protocol
+ *          handling, concurrent client management, error recovery, and end-to-end workflows.
+ * @author Alejandro Martinez Lopez
+ * @date 2025
+ */
+
 #include <gtest/gtest.h>
 #include <boost/asio.hpp>
 #include <thread>
@@ -214,8 +224,15 @@ TEST_F(TcpServerFunctionalTest, MalformedJSONHandling) {
     }
 }
 
-// ---- Concurrency Tests (Simplified) ----
-
+// ---- Concurrency Tests ----
+/**
+ * @brief Test concurrent booking attempts for the same seat
+ * @details Validates that when multiple clients simultaneously attempt to book
+ *          the same seat, only one succeeds while others receive failure responses.
+ *          Uses atomic counters for synchronization to ensure true concurrency.
+ * @test Verifies thread safety and race condition handling in booking system
+ * @note Uses 5 concurrent clients with atomic synchronization for C++17 compatibility
+ */
 TEST_F(TcpServerFunctionalTest, ConcurrentBookingSameSeat) {
     const int num_clients = 5; // Reduced from 10
     std::vector<std::future<json::value>> futures;
@@ -261,6 +278,14 @@ TEST_F(TcpServerFunctionalTest, ConcurrentBookingSameSeat) {
     EXPECT_EQ(failed_bookings, num_clients - 1);
 }
 
+/**
+ * @brief Test concurrent booking of different seats
+ * @details Validates that multiple clients can successfully book different seats
+ *          simultaneously without conflicts. Tests the system's ability to handle
+ *          non-conflicting concurrent operations efficiently.
+ * @test Verifies concurrent booking success for non-overlapping seat requests
+ * @note Uses seats a11-a15 to ensure all requests are within valid seat range (a1-a20)
+ */
 TEST_F(TcpServerFunctionalTest, ConcurrentBookingDifferentSeats) {
     const int num_clients = 5; // Reduced and using valid seat range
     std::vector<std::future<json::value>> futures;
@@ -302,7 +327,14 @@ TEST_F(TcpServerFunctionalTest, ConcurrentBookingDifferentSeats) {
 }
 
 // ---- Integration Workflow Test ----
-
+/**
+ * @brief Test complete booking workflow from discovery to confirmation
+ * @details Validates the entire user journey: listing movies, finding theaters,
+ *          checking seat availability, booking seats, and verifying the booking.
+ *          This test simulates a real user interaction with the system.
+ * @test Verifies end-to-end booking workflow and state consistency
+ * @note Tests the complete integration of all system components through the TCP interface
+ */
 TEST_F(TcpServerFunctionalTest, CompleteBookingWorkflow) {
     // 1. List movies
     json::value list_movies_req = {{"command", "LIST_MOVIES"}};

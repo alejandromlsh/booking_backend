@@ -1,3 +1,13 @@
+/**
+ * @file unit_test.cpp
+ * @brief Comprehensive unit tests for the Movie Booking System
+ * @details This file contains unit tests for all core components of the movie booking system,
+ *          including basic functionality tests and advanced concurrency/thread safety tests.
+ *          The tests validate individual component behavior and system-wide thread safety.
+ * @author Alejandro Martinez Lopez
+ * @date 2025
+ */
+
 #include <gtest/gtest.h>
 #include <memory>
 #include <vector>
@@ -152,7 +162,14 @@ TEST(BookingServiceTest, BookSeatsSuccessAndFailure) {
 }
 
 // ---- Concurrency and Thread Safety Tests ----
-
+/**
+ * @brief Test atomic seat booking under race conditions
+ * @details Validates that the atomic booking mechanism in the Seat class
+ *          correctly handles concurrent booking attempts, ensuring only one
+ *          thread can successfully book a seat even under race conditions.
+ * @test Verifies atomic seat booking and race condition handling
+ * @note This test uses 10 concurrent threads to stress-test the atomic mechanism
+ */
 TEST(SeatTest, ConcurrentBookingRaceCondition) {
     Seat seat("a1");
     const int num_threads = 10;
@@ -178,6 +195,14 @@ TEST(SeatTest, ConcurrentBookingRaceCondition) {
     EXPECT_FALSE(seat.is_available());
 }
 
+/**
+ * @brief Test concurrent booking conflicts for the same seat
+ * @details Validates that when multiple threads attempt to book the same seat
+ *          simultaneously, only one succeeds while all others fail.
+ *          This is a high-stress test with 50 concurrent threads.
+ * @test Verifies theater-level thread safety under maximum contention
+ * @note This test uses 50 concurrent threads all attempting to book seat "a1"
+ */
 TEST(TheaterTest, ConcurrentSeatBookingStressTest) {
     Theater theater(1, "Stress Test Cinema");
     Movie movie(1, "Concurrent Movie");
@@ -234,6 +259,14 @@ TEST(TheaterTest, ConcurrentSameSeatBookingConflict) {
     EXPECT_EQ(successful_bookings, 1);
 }
 
+/**
+ * @brief Test concurrent operations through booking service
+ * @details Validates that the booking service can handle concurrent booking
+ *          requests safely, ensuring thread safety at the service layer.
+ *          Tests the complete booking workflow under concurrent access.
+ * @test Verifies end-to-end system thread safety through the service layer
+ * @note This test uses up to 30 concurrent threads booking through the service
+ */
 TEST(BookingServiceTest, ConcurrentServiceOperations) {
     BookingService service;
     Movie movie(1, "Service Test Movie");
