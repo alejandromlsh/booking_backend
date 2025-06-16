@@ -5,13 +5,15 @@
 #include <vector>
 #include <memory>
 #include "Models/BookingService.h"
+#include "aux/ThreadPool.h"
+
 
 namespace json = boost::json;
 
 
 class TcpServer {
 public:
-  TcpServer(boost::asio::io_context & io_context, unsigned short port, BookingService & booking_service, std::size_t thread_pool_size = 4);
+  TcpServer(boost::asio::io_context & io_context, unsigned short port, BookingService & booking_service, std::size_t thread_pool_size);
   void start();
 private:
   void do_accept();
@@ -23,4 +25,5 @@ private:
   boost::asio::ip::tcp::acceptor acceptor_;
   BookingService & booking_service_;
   std::size_t threadpool_size_;
+  ThreadPool thread_pool_;
 };
