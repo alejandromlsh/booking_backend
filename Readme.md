@@ -7,7 +7,7 @@ This movie booking system is built with modern C++20. Some of the software desig
   Visible in the Interface/ directory
  - **Factory creational pattern** for decoupling the creation of different types of Seats.
  - **move semantics**,**perfect forwarding**, **type traits** and other modern C++ performance enhancers:
- Move semantics for adding movies and perfect forwarding for adding seats
+ Move semantics for adding movies and perfect forwarding for adding seats together with the Factory pattern. In the current code they do not provide such a increase in performance, but if the classes would become heavier in the future this would change.
  - **TCP server connection** to clients with **JSON messages**:
  In the TCP server file
  - **Unit Testing** and **functional testing** using GTest and Mocking interfaces:
@@ -26,6 +26,23 @@ This movie booking system is built with modern C++20. Some of the software desig
   - Metaprogramming for the computations in the code as the number of rows in the theater. But since that computation is small and does not affect the end user but the AdministrationService the improvement of performance is neglibible.
   - Config File
   - And of course a DataBase although that was explicitly excluded
+
+
+## Doxygen documentation.
+
+Before building the system you can build the documentation in your linux machine using:
+
+```sh
+doxygen Doxyfile
+cd docs/
+cd html/
+open index.html
+```
+That should open it into your browser.
+
+You are in the main page, click in classes or files and you will be able to see them all together with some graphics and information.
+
+In the main page you can also see all necessary information to compile and run, although in the Readme.md could be more detailed.
 
 
 ## Building the system
@@ -126,7 +143,7 @@ cd build
 
 For me it was interesting to use Boost 1.85 new functionalities to work with json format, before that you need to use other third party libraries that are not so well tested as Boost.
 
-Also the reflection about the system. Build such booking system in a "dirty way" is easy, but are you doing it correctly? Are you choosing a extensible design and architecture? Is it easibly extensible? It is able to support some load? Am I focusing in the important areas to get a production system or in the wrong?
+Also the reflection about the system. Build such booking system in a "dirty way" is easy, but are you doing it correctly? Are you choosing a extensible design and architecture? Is it easibly extensible? It is able to support some load? Am I focusing in the important areas to get a production system quickly or in the wrong?
 
 I did a couple of big refactorings along the way, when I realise some decisions were wrong. For example in the first version both the BookingService and the AdministrativeService were part of the same class.
 Also at the beginning the TCPServer communicate wihout json format, making it much less powerful.
@@ -138,9 +155,12 @@ The code itself it is not very difficult, although always some integration with 
 The most tricky part was to think about the scope of the application, I wanted to do something relatively production ready so the question is what features are missing?
 For Example, Should I implement a User Authorization Simple System? Or should I stay with the plain requirements and just use the best C++ and algorithm choices to do the biggest possible optimization.
 Similar with the multithreading, right now it works, it is relatively system but seems to be appropiate for the scope. However, if the system would be use in real-world it would face a much higher load and the system could bottleneck under certain cirmcumstances.
-Also in some of the algorithms, for example right not the search for theathers that has a movie is linear. This could be improved, should I do it? Or it is better to focus in another feature.
+Also in some of the algorithms, for example right not the search for theathers that has a movie is linear. This could be improved, should I do it? Or it is better to focus in another feature right now.
 
 Since my experience is in a different domain this questions were insteresting.
+
+
+
 
 
 
@@ -607,4 +627,4 @@ INTEGRATION TESTING APPROACH:
 - Smart pointers for efficient memory use
 - Scalable, with support for multiple storage backends
 
-This architecture is built for real-world use: it is maintainable, testable, and performs well even with many users at the same time.
+

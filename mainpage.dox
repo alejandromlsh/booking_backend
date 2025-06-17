@@ -1,0 +1,169 @@
+/**
+ * @mainpage Movie Booking System Documentation
+ * 
+ * @section intro_sec Introduction
+ * 
+ * Welcome to the Movie Booking System - a robust, cross-platform C++ backend service
+ * designed for high-performance movie theater seat booking operations.
+ * 
+ * @section features_sec Key Features
+ * 
+ * - **Thread-Safe Operations**: Atomic seat booking with race condition prevention
+ * - **Scalable Architecture**: Multi-threaded TCP server with configurable thread pools
+ * - **Modern C++17**: Extensive use of smart pointers, RAII, and move semantics
+ * - **Polymorphic Design**: Support for different seat types (Regular, VIP)
+ * - **JSON API**: RESTful-style JSON communication protocol
+ * - **Comprehensive Testing**: Unit tests and integration tests included
+ * 
+ * @section arch_sec System Architecture
+ * 
+ * The system follows clean architecture principles with clear separation of concerns:
+ * 
+ * - **Interfaces Layer**: Abstract contracts (ISeat, ITheater, IBookingService)
+ * - **Models Layer**: Core business entities (Movie, Theater, Seat implementations)
+ * - **Services Layer**: Business logic (BookingService, AdministrationService)
+ * - **Controller Layer**: Network communication (TcpServer)
+ * - **Data Layer**: Thread-safe data storage (CentralDataStore)
+ * 
+ * @section build_sec Building the Project
+ * 
+ * @subsection prerequisites Prerequisites
+ * - Docker installed on your system
+ * - C++17 compatible compiler
+ * - CMake (version 3.10 or higher)
+ * - Boost libraries (for Asio and JSON support)
+ * 
+ * @subsection docker_build Docker-Based Build (Recommended)
+ * 
+ * The project includes Docker configuration for consistent builds across environments:
+ * 
+ * ```
+ * # Make build scripts executable
+ * chmod +x build_docker.sh
+ * chmod +x enter_docker.sh
+ * 
+ * # Build Docker environment
+ * ./build_docker.sh
+ * ```
+ * 
+ * @subsection main_app_build Main Server Application
+ * 
+ * Build the movie booking server:
+ * 
+ * ```
+ * mkdir build
+ * cd build
+ * cmake ..
+ * make
+ * ```
+ * 
+ * This creates the main server executable that handles:
+ * - TCP server on port 12345
+ * - JSON API for booking operations
+ * - Multi-threaded request handling
+ * - Thread-safe seat booking operations
+ * 
+ * @subsection client_build Client Application
+ * 
+ * Build the client application for testing:
+ * 
+ * ```
+ * cd client
+ * mkdir build
+ * cd build
+ * cmake ..
+ * make
+ * ```
+ * 
+ * @subsection running_sec Running the System
+ * 
+ * 1. **Start the Server**:
+ *    ```
+ *    ./movie_booking_server
+ *    ```
+ *    Server will start on port 12345 with sample data pre-loaded.
+ * 
+ * 2. **Connect with Client**:
+ *    ```
+ *    ./client
+ *    ```
+ *    Or use any TCP client (telnet, netcat) to connect to localhost:12345
+ * 
+ * 3. **Test with JSON Commands**:
+ *    ```
+ *    {"command": "LIST_MOVIES"}
+ *    {"command": "LIST_THEATERS", "movie_id": 1}
+ *    {"command": "LIST_SEATS", "theater_id": 1, "movie_id": 1}
+ *    {"command": "BOOK", "theater_id": 1, "movie_id": 1, "seats": ["a1", "a2"]}
+ *    ```
+ * 
+ * @subsection build_targets Build Targets
+ * 
+ * Your CMakeLists.txt should include these targets:
+ * - **movie_booking_server**: Main server application
+ * - **unit_tests**: Comprehensive test suite
+ * - **functional_tests**: TCP integration tests
+ * - **client**: Test client application
+ * 
+ * @subsection dev_workflow Development Workflow
+ * 
+ * Complete development build cycle:
+ * ```
+ * # Prepare environment
+ * chmod +x build_docker.sh enter_docker.sh
+ * ./build_docker.sh
+ * 
+ * # Build and test main application
+ * mkdir -p build && cd build
+ * cmake .. && make
+ * ./unit_tests          # Run unit tests
+ * ./functional_tests    # Run integration tests
+ * 
+ * # Build client for testing
+ * cd ../client
+ * mkdir -p build && cd build
+ * cmake .. && make
+ * ```
+ * 
+ * @section usage_sec Basic Usage
+ * 
+ * Connect to the server using TCP and send JSON commands:
+ * 
+ * ```
+ * {"command": "LIST_MOVIES"}
+ * {"command": "LIST_THEATERS", "movie_id": 1}
+ * {"command": "LIST_SEATS", "theater_id": 1, "movie_id": 1}
+ * {"command": "BOOK", "theater_id": 1, "movie_id": 1, "seats": ["a1", "a2"]}
+ * ```
+ * 
+ * @section api_sec API Reference
+ * 
+ * For detailed API documentation, see:
+ * - @ref BookingService "Booking Operations"
+ * - @ref AdministrationService "Administration Operations"
+ * - @ref TcpServer "Network Communication"
+ * 
+ * @section testing_sec Testing
+ * 
+ * The project includes comprehensive test coverage:
+ * - Unit tests for all core components
+ * - Concurrency tests for thread safety validation
+ * - Integration tests for end-to-end workflows
+ * 
+ * @section production_sec Production Deployment
+ * 
+ * For production deployment, your Docker configuration provides:
+ * - **Multi-stage builds** for optimized container size
+ * - **Dependency management** with proper Boost library linking
+ * - **Configuration flexibility** through environment variables
+ * 
+ * @section author_sec Author & License
+ * 
+ * **Author**: Your Name  
+ * **Version**: 1.0  
+ * **License**: [Specify your license]
+ * 
+ * @section contact_sec Contact & Support
+ * 
+ * For questions or support, please contact [your contact information].
+ */
