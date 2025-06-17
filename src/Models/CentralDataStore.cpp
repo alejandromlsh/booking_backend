@@ -25,7 +25,17 @@ std::vector<Movie> CentralDataStore::get_all_movies() const {
   std::shared_lock<std::shared_mutex> lock(data_mutex_);
   std::vector<Movie> result;
   result.reserve(movies_.size());
+  
+  // Sort by ID to ensure consistent ordering
+  std::vector<std::pair<int, Movie>> sorted_movies;
   for (const auto& pair : movies_) {
+    sorted_movies.push_back(pair);
+  }
+  
+  std::sort(sorted_movies.begin(), sorted_movies.end(),
+            [](const auto& a, const auto& b) { return a.first < b.first; });
+  
+  for (const auto& pair : sorted_movies) {
     result.push_back(pair.second);
   }
   return result;

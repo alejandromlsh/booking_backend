@@ -22,8 +22,8 @@ CommandType parse_command(const std::string& cmd) {
 }
 
 TcpServer::TcpServer(boost::asio::io_context & io_context,unsigned short port,
-    BookingService & booking_service, std::size_t thread_pool_size) : //acceptor_(io_context,boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(),port)),
-    acceptor_(io_context),booking_service_(booking_service),threadpool_size_(thread_pool_size) ,thread_pool_(thread_pool_size) {
+    BookingService & booking_service, AdministrationService& admin_service, std::size_t thread_pool_size) : //acceptor_(io_context,boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(),port)),
+    acceptor_(io_context),booking_service_(booking_service),admin_service_(admin_service),threadpool_size_(thread_pool_size) ,thread_pool_(thread_pool_size) {
     
     using namespace boost::asio;
     boost::system::error_code ec;
