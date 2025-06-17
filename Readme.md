@@ -2,7 +2,31 @@
 # MOVIE BOOKING SYSTEM
 
 ## Overview
-This movie booking system is built with modern C++20. The system uses interface-based architecture, dependency injection, and deep testing. It manages concurrent seat bookings through a TCP server, using a JSON API protocol for communication.
+This movie booking system is built with modern C++20. Some of the software design choices and C++ features are:
+ - **interface-based architecture** with **dependency injection** for decoupling make easier future extensions:
+  Visible in the Interface/ directory
+ - **Factory creational pattern** for decoupling the creation of different types of Seats.
+ - **move semantics**,**perfect forwarding**, **type traits** and other modern C++ performance enhancers:
+ Move semantics for adding movies and perfect forwarding for adding seats
+ - **TCP server connection** to clients with **JSON messages**:
+ In the TCP server file
+ - **Unit Testing** and **functional testing** using GTest and Mocking interfaces:
+ In the Test/ directory
+ - **Multithreading** for asynchronous manage of requests:
+ Managed in the TCPServer and with protections in the relevant places.
+
+ Overall I designed the application with SOLID principles in mind, and applying modern C++ features to increase the performance of the system.
+ 
+ Some extra features I could have implemented:
+  - A TheaterFactory similar to the SeatFactory. It has sense since there could also be several types of theaters (like IMAX, Standard and so on).
+  - A HTTP server on top of the TCP server.
+  - A GUI for the client using Qt
+  - A User Authorization System
+  - Replace all locks with atomics operation for increased performance.
+  - Metaprogramming for the computations in the code as the number of rows in the theater. But since that computation is small and does not affect the end user but the AdministrationService the improvement of performance is neglibible.
+  - Config File
+  - And of course a DataBase although that was explicitly excluded
+
 
 ## Building the system
 
