@@ -12,7 +12,7 @@ find_package(Threads REQUIRED)
 include_directories(${Boost_INCLUDE_DIRS})
 
 # --- Source Files ---
-file(GLOB_RECURSE CLIENT_SOURCES "Client.cpp")
+file(GLOB_RECURSE CLIENT_SOURCES "SimpleClient.cpp")
 
 # --- Executable Target ---
 add_executable(movie_booking_client ${CLIENT_SOURCES})
