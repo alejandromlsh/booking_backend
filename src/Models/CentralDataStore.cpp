@@ -3,7 +3,8 @@
 
 void CentralDataStore::add_movie(const Movie& movie) {
   std::scoped_lock<std::shared_mutex> lock(data_mutex_);
-  movies_[movie.get_id()] = movie;
+  //movies_[movie.get_id()] = movie;
+  movies_.insert_or_assign(movie.get_id(), movie);
 }
 
 void CentralDataStore::remove_movie(int movie_id) {
