@@ -24,38 +24,38 @@ CommandType parse_command(const std::string& cmd) {
 TcpServer::TcpServer(boost::asio::io_context & io_context,unsigned short port,
     IBookingService & booking_service, IAdministrationService& admin_service, std::size_t thread_pool_size) : //acceptor_(io_context,boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(),port)),
     acceptor_(io_context),booking_service_(booking_service),admin_service_(admin_service),threadpool_size_(thread_pool_size) ,thread_pool_(thread_pool_size) {
-    
-    using namespace boost::asio;
-    boost::system::error_code ec;
+  
+  using namespace boost::asio;
+  boost::system::error_code ec;
 
-    // Open the acceptor
-    acceptor_.open(ip::tcp::v4(), ec);
-    if (ec) {
-        throw std::runtime_error("Open error: " + ec.message());
-    }
+  // Open the acceptor
+  acceptor_.open(ip::tcp::v4(), ec);
+  if (ec) {
+      throw std::runtime_error("Open error: " + ec.message());
+  }
 
-    // Set reuse address option
-    acceptor_.set_option(ip::tcp::acceptor::reuse_address(true), ec);
-    if (ec) {
-        // Non-fatal error, log but continue
-        std::cerr << "Set option warning: " << ec.message() << std::endl;
-    }
+  // Set reuse address option
+  acceptor_.set_option(ip::tcp::acceptor::reuse_address(true), ec);
+  if (ec) {
+      // Non-fatal error, log but continue
+      std::cerr << "Set option warning: " << ec.message() << std::endl;
+  }
 
-    // Bind to port
-    acceptor_.bind(ip::tcp::endpoint(ip::tcp::v4(), port), ec);
-    if (ec) {
-        throw std::runtime_error("Bind error: " + ec.message());
-    }
+  // Bind to port
+  acceptor_.bind(ip::tcp::endpoint(ip::tcp::v4(), port), ec);
+  if (ec) {
+      throw std::runtime_error("Bind error: " + ec.message());
+  }
 
-    // Start listening
-    acceptor_.listen(socket_base::max_listen_connections, ec);
-    if (ec) {
-        throw std::runtime_error("Listen error: " + ec.message());
-    }
+  // Start listening
+  acceptor_.listen(socket_base::max_listen_connections, ec);
+  if (ec) {
+      throw std::runtime_error("Listen error: " + ec.message());
+  }
 
-    std::cout << "Server bound to port " << port << std::endl;
+  std::cout << "Server bound to port " << port << std::endl;
 
-    }
+}
 
 void TcpServer::start() {
   do_accept();
