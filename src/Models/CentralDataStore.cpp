@@ -2,9 +2,9 @@
 #include <algorithm>
 #include <mutex>
 
-void CentralDataStore::add_movie(const Movie& movie) {
+void CentralDataStore::add_movie(Movie&& movie) {
   std::unique_lock<std::shared_mutex> lock(data_mutex_);
-  movies_.insert_or_assign(movie.get_id(), movie);
+  movies_.insert_or_assign(movie.get_id(), std::move(movie));
 }
 
 void CentralDataStore::remove_movie(int movie_id) {

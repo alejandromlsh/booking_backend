@@ -20,7 +20,7 @@ class ITheater {
 public:
   virtual ~ITheater() = default;
   
-  virtual void add_movie(const Movie& movie) = 0;
+  virtual void add_movie(Movie&& movie) = 0;
   virtual std::vector<std::string> get_available_seats(int movie_id) const = 0;
   virtual bool book_seats(int movie_id, const std::vector<std::string>& seat_ids) = 0;
   virtual int get_id() const = 0;

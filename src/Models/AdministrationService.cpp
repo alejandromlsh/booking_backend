@@ -8,8 +8,8 @@ AdministrationService::AdministrationService(std::shared_ptr<IDataStore> data_st
   }
 }
 
-void AdministrationService::add_movie(const Movie& movie) {
-  data_store_->add_movie(movie);
+void AdministrationService::add_movie(Movie&& movie) {
+  data_store_->add_movie(std::move(movie));
 }
 
 void AdministrationService::remove_movie(int movie_id) {
@@ -40,10 +40,10 @@ bool AdministrationService::theater_exists(int theater_id) const {
   return data_store_->theater_exists(theater_id);
 }
 
-void AdministrationService::schedule_movie_in_theater(int theater_id, const Movie& movie) {
+void AdministrationService::schedule_movie_in_theater(int theater_id, Movie&& movie) {
   auto theater = data_store_->get_theater(theater_id);
   if (theater) {
-    theater->add_movie(movie);
+    theater->add_movie(std::move(movie));
   } else {
     throw std::runtime_error("Theater not found: " + std::to_string(theater_id));
   }

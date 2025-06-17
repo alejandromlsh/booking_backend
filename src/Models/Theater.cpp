@@ -2,11 +2,11 @@
 #include "Models/Seat.h"
 #include <cmath>
 
-Theater::Theater(int id, const std::string& name) : id_(id), name_(name) {}
+Theater::Theater(int id,std::string name) : id_(id), name_(std::move(name)) {}
 
-void Theater::add_movie(const Movie & movie) {
+void Theater::add_movie(Movie&& movie) {
   std::scoped_lock lock(mtx_);
-  movies_.push_back(movie);
+  movies_.push_back(std::move(movie));
   initialize_seats(movie.get_id(),seat_count_);
 }
 

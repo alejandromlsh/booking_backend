@@ -23,7 +23,7 @@ class IDataStore {
 public:
   virtual ~IDataStore() = default;
   
-  virtual void add_movie(const Movie& movie) = 0;
+  virtual void add_movie(Movie&& movie) = 0;
   virtual void remove_movie(int movie_id) = 0;
   virtual Movie get_movie(int movie_id) const = 0;
   virtual std::vector<Movie> get_all_movies() const = 0;

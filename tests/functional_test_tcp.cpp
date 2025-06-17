@@ -50,14 +50,14 @@ protected:
     // Setup test data using administration service
     Movie m1(1, "Inception");
     Movie m2(2, "The Matrix");
-    admin_service_->add_movie(m1);
-    admin_service_->add_movie(m2);
+    admin_service_->add_movie(Movie(m1));
+    admin_service_->add_movie(Movie(m2));
 
     auto t1 = std::make_shared<Theater>(1, "Cinema One");
     auto t2 = std::make_shared<Theater>(2, "Cinema Two");
-    t1->add_movie(m1);
-    t1->add_movie(m2);
-    t2->add_movie(m2);
+    t1->add_movie(std::move(m1));
+    t1->add_movie(Movie(m2));
+    t2->add_movie(std::move(m2));
 
     admin_service_->add_theater(t1);
     admin_service_->add_theater(t2);

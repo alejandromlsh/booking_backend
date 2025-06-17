@@ -22,7 +22,7 @@ class AdministrationService : public IAdministrationService {
 public:
   explicit AdministrationService(std::shared_ptr<IDataStore> data_store);
   
-  void add_movie(const Movie& movie) override;
+  void add_movie(Movie&& movie) override;
   void remove_movie(int movie_id) override;
   std::vector<Movie> get_all_movies() const override;
   bool movie_exists(int movie_id) const override;
@@ -32,7 +32,7 @@ public:
   std::vector<std::shared_ptr<ITheater>> get_all_theaters() const override;
   bool theater_exists(int theater_id) const override;
   
-  void schedule_movie_in_theater(int theater_id, const Movie& movie) override;
+  void schedule_movie_in_theater(int theater_id, Movie&& movie) override;
   void remove_movie_from_theater(int theater_id, int movie_id) override;
   void set_theater_capacity(int theater_id, int capacity) override;
 
