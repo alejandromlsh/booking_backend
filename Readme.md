@@ -18,7 +18,7 @@ This movie booking system is built with modern C++20. Some of the software desig
  Overall I designed the application with SOLID principles in mind, and applying modern C++ features to increase the performance of the system.
  
  Some extra features I could have implemented:
-  - A TheaterFactory similar to the SeatFactory. It has sense since there could also be several types of theaters (like IMAX, Standard and so on).
+  - A TheaterFactory similar to the SeatFactory. It has sense since there could also be several types of theaters (like IMAX, Standard and so on). This would open the door to different types of theaters with different layouts and number of Seats
   - A HTTP server on top of the TCP server.
   - A GUI for the client using Qt
   - A User Authorization System
@@ -104,6 +104,13 @@ cd build
 ```
 Now you can use its instructions to communicate and book tickets. The architecture design is more though to replace this simple client by a GUI,
 so that a human does not need to see those json objects, but that is something for a future extension.
+
+### What is interesting to run?
+
+Basically list list seats for a movie in one theater, them book some, and then list the available seats again. It will be seen that the ones that are booked have dissapeared.
+
+Also you can list available seats, and from other terminal book those seats. In your terminal when you try to book it wont work.
+So there will not be overboking.
 
 ### Testing the system
 Simply go to the test build folder and run the tests there:

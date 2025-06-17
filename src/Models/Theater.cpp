@@ -1,5 +1,8 @@
 #include "Models/Theater.h"
 #include "Models/Seat.h"
+#include "Models/VipSeat.h"
+#include "Factories/SeatFactory.h"
+#include <algorithm>
 #include <cmath>
 
 Theater::Theater(int id,std::string name) : id_(id), name_(std::move(name)) {}
@@ -12,21 +15,25 @@ void Theater::add_movie(Movie&& movie) {
 
 void Theater::initialize_seats(int movie_id, int seat_count) {
     auto& seats = seats_per_movie_[movie_id];
-    
-    // Calculate rows and seats per row for a squared layout
-    seats_per_row = ceil(sqrt(seat_count)); //explicit conversion for clarity
-    int num_rows = (seat_count + seats_per_row - 1) / seats_per_row;  // Ceiling division
+    seats_per_row = ceil(sqrt(seat_count));
+    int num_rows = (seat_count + seats_per_row - 1) / seats_per_row;
     
     for (int row = 0; row < num_rows; ++row) {
-        char row_letter = 'a' + row;  // a, b, c, d, e...
-        
+        char row_letter = 'a' + row;
         int seats_in_this_row = std::min(seats_per_row, seat_count - (row * seats_per_row));
         for (int seat = 1; seat <= seats_in_this_row; ++seat) {
             std::string seat_id = std::string(1, row_letter) + std::to_string(seat);
-            seats.emplace(seat_id, std::make_shared<Seat>(seat_id));
+            
+            // Create VIP seats for first row, regular seats for others
+            if (row == 0) {
+                seats.emplace(seat_id, std::make_shared<VipSeat>(seat_id));
+            } else {
+                seats.emplace(seat_id, std::make_shared<Seat>(seat_id));
+            }
         }
     }
 }
+
 
 std::vector<std::string> Theater::get_available_seats(int movie_id) const {
   std::scoped_lock lock(mtx_);
