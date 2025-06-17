@@ -1,24 +1,36 @@
 #pragma once
-#include <vector>
+
 #include <memory>
 #include <mutex>
+#include <vector>
+#include <string>
 #include "Movie.h"
 #include "Theater.h"
+#include "CentralDataStore.h"
 
+/**
+ * @class BookingService
+ * @brief Service responsible for booking operations only
+ * @details Handles seat booking, availability queries, and booking-related
+ *          operations. Administrative functions have been moved to
+ *          AdministrationService following Single Responsibility Principle.
+ */
+class BookingService {
+public:
+  explicit BookingService(std::shared_ptr<CentralDataStore> data_store);
 
-// Right nwt is a Singleton but better to modify it to dependency injection
-class BookingService{
-  public:
-  BookingService() = default;
-  void add_theater(const std::shared_ptr<Theater>& theater);
-  void add_movie(const Movie& movie);
-
+  // Read-only queries for booking interface
   std::vector<Movie> get_all_movies() const;
   std::vector<std::shared_ptr<Theater>> get_theaters_showing_movie(int movie_id) const;
   std::vector<std::string> get_available_seats(int theater_id, int movie_id) const;
-  bool book_seats(int theater_id, int movie_id, const std::vector<std::string>&seats_ids);
+
+  // Booking operations
+  bool book_seats(int theater_id, int movie_id, const std::vector<std::string>& seat_ids);
+
+  // Booking validation
+  bool can_book_seats(int theater_id, int movie_id, const std::vector<std::string>& seat_ids) const;
+
 private:
-  mutable std::mutex mtx_;
-  std::vector<std::shared_ptr<Theater>> theaters_;
-  std::vector<Movie> movies_;
+  std::shared_ptr<CentralDataStore> data_store_;
+  mutable std::mutex booking_mutex_;
 };

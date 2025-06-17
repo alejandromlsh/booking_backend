@@ -3,6 +3,7 @@
 
 class Movie {
 public:
+  Movie() = default; //it is needed by the unordered maps
   Movie(int id,const std::string& name);
   int get_id() const;
   std::string get_name() const;

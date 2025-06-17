@@ -18,7 +18,9 @@
 #include <atomic>
 
 #include "Controller/TcpServer.h"
+#include "Models/CentralDataStore.h"
 #include "Models/BookingService.h"
+#include "Models/AdministrationService.h"
 #include "Models/Theater.h"
 #include "Models/Movie.h"
 
@@ -33,17 +35,23 @@ protected:
   boost::asio::io_context io_context_;
   std::unique_ptr<std::thread> server_thread_;
   std::unique_ptr<TcpServer> server_;
+  std::shared_ptr<CentralDataStore> data_store_;
   std::unique_ptr<BookingService> booking_service_;
+  std::unique_ptr<AdministrationService> admin_service_;
 
   void SetUp() override {
     port_ = base_port_ + test_counter_++;
-    booking_service_ = std::make_unique<BookingService>();
     
-    // Setup test data
+    // Create Phase 1 architecture components
+    data_store_ = std::make_shared<CentralDataStore>();
+    booking_service_ = std::make_unique<BookingService>(data_store_);
+    admin_service_ = std::make_unique<AdministrationService>(data_store_);
+    
+    // Setup test data using administration service
     Movie m1(1, "Inception");
     Movie m2(2, "The Matrix");
-    booking_service_->add_movie(m1);
-    booking_service_->add_movie(m2);
+    admin_service_->add_movie(m1);
+    admin_service_->add_movie(m2);
 
     auto t1 = std::make_shared<Theater>(1, "Cinema One");
     auto t2 = std::make_shared<Theater>(2, "Cinema Two");
@@ -51,10 +59,10 @@ protected:
     t1->add_movie(m2);
     t2->add_movie(m2);
 
-    booking_service_->add_theater(t1);
-    booking_service_->add_theater(t2);
+    admin_service_->add_theater(t1);
+    admin_service_->add_theater(t2);
 
-    server_ = std::make_unique<TcpServer>(io_context_, port_, *booking_service_, 2);
+    server_ = std::make_unique<TcpServer>(io_context_, port_, *booking_service_, *admin_service_, 2);
     server_thread_ = std::make_unique<std::thread>([this]() {
       try {
         server_->start();
@@ -284,7 +292,7 @@ TEST_F(TcpServerFunctionalTest, ConcurrentBookingSameSeat) {
  *          simultaneously without conflicts. Tests the system's ability to handle
  *          non-conflicting concurrent operations efficiently.
  * @test Verifies concurrent booking success for non-overlapping seat requests
- * @note Uses seats a11-a15 to ensure all requests are within valid seat range (a1-a20)
+ * @note Uses valid seats from the 5x4 grid layout to ensure all requests succeed
  */
 TEST_F(TcpServerFunctionalTest, ConcurrentBookingDifferentSeats) {
   const int num_clients = 5; // Reduced and using valid seat range
@@ -293,17 +301,17 @@ TEST_F(TcpServerFunctionalTest, ConcurrentBookingDifferentSeats) {
   std::atomic<int> ready_count{0};
   std::atomic<bool> all_ready{false};
   
+  // Use valid seats from the 5x4 grid layout (ceil(sqrt(20)) = 5 seats per row, 4 rows)
+  std::vector<std::string> valid_seats = {"b1", "b2", "b3", "b4", "b5"};
+  
   for (int i = 0; i < num_clients; ++i) {
-    futures.push_back(std::async(std::launch::async, [this, i, &ready_count, &all_ready]() {
+    futures.push_back(std::async(std::launch::async, [this, i, &ready_count, &all_ready, &valid_seats]() {
       ready_count.fetch_add(1);
       while (!all_ready.load()) {
         std::this_thread::sleep_for(std::chrono::microseconds(10));
       }
       
-      // Generate valid seat IDs for sqrt(20) = 5 seats per row
-      char row = 'a' + (i / 5);
-      int seat = (i % 5) + 1; 
-      json::array seats = {"a" + std::to_string(11 + i)};
+      json::array seats = {valid_seats[i]};
       json::value req = {{"command", "BOOK"}, {"theater_id", 1}, {"movie_id", 1}, {"seats", seats}};
       return send_and_receive_json(req, 2000);
     }));
