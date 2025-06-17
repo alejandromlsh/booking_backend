@@ -1,4 +1,3 @@
-// src/main.cpp
 #include <iostream>
 #include <memory>
 #include <thread>
@@ -24,18 +23,32 @@ int main() {
     // Setup sample movies
     Movie m1(1, "Inception");
     Movie m2(2, "The Matrix");
-    admin_service->add_movie(m1);
-    admin_service->add_movie(m2);
+    Movie m3(3, "The Lord Of The Ring: The Return of The King");
+
+    admin_service->add_movie(std::move(m1));
+    admin_service->add_movie(std::move(m2));
+    admin_service->add_movie(Movie(m3));
+
 
     // Setup sample theaters and schedule movies
-    std::shared_ptr<ITheater> t1 = std::make_shared<Theater>(1, "Cinema One");  // Cast to interface
-    std::shared_ptr<ITheater> t2 = std::make_shared<Theater>(2, "Cinema Two");  // Cast to interface
+    std::shared_ptr<ITheater> t1 = std::make_shared<Theater>(1, "Cinema Madrid");  // Cast to interface
+    std::shared_ptr<ITheater> t2 = std::make_shared<Theater>(2, "Cinema Tokio");  // Cast to interface
+    std::shared_ptr<ITheater> t3 = std::make_shared<Theater>(3, "Cinema Abu Dhabi");  // Cast to interface
+
     
     admin_service->add_theater(t1);
     admin_service->add_theater(t2);
-    admin_service->schedule_movie_in_theater(1, m1);
-    admin_service->schedule_movie_in_theater(1, m2);
-    admin_service->schedule_movie_in_theater(2, m2);
+    admin_service->add_theater(t3);
+    admin_service->schedule_movie_in_theater(1, Movie(1,"Inception"));
+    admin_service->schedule_movie_in_theater(1, Movie(2,"The Matrix"));
+    admin_service->schedule_movie_in_theater(2, Movie(2,"The Matrix"));
+    admin_service->schedule_movie_in_theater(3, Movie(2,"The Matrix"));
+    admin_service->schedule_movie_in_theater(3, Movie(3,"Inception"));
+    admin_service->schedule_movie_in_theater(3, std::move(m3));
+
+    
+
+
 
     std::cout << "System initialized with " << booking_service->get_all_movies().size()
               << " movies and " << admin_service->get_all_theaters().size() << " theaters." << std::endl;

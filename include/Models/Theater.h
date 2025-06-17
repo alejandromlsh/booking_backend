@@ -22,9 +22,10 @@
  */
 class Theater : public ITheater {
 public:
-  Theater(int id, const std::string& name);
+  // Name of theater could be bigger than SSO, so pass-by-balue and move is preferred.
+  Theater(int id,std::string name);
   
-  void add_movie(const Movie& movie) override;
+  void add_movie(Movie&& movie) override;
   std::vector<std::string> get_available_seats(int movie_id) const override;
   bool book_seats(int movie_id, const std::vector<std::string>& seat_ids) override;
   int get_id() const override;

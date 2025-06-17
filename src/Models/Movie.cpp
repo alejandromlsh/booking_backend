@@ -1,6 +1,6 @@
 #include "Models/Movie.h"
 
-Movie::Movie(int id, const std::string& name) : id_(id), name_(name) {}
+Movie::Movie(int id,std::string name) : id_(id), name_(std::move(name)) {}
 
 int Movie::get_id() const { return id_; }
 

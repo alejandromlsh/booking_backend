@@ -22,7 +22,7 @@ class IAdministrationService {
 public:
   virtual ~IAdministrationService() = default;
   
-  virtual void add_movie(const Movie& movie) = 0;
+  virtual void add_movie(Movie&& movie) = 0;
   virtual void remove_movie(int movie_id) = 0;
   virtual std::vector<Movie> get_all_movies() const = 0;
   virtual bool movie_exists(int movie_id) const = 0;
@@ -32,7 +32,7 @@ public:
   virtual std::vector<std::shared_ptr<ITheater>> get_all_theaters() const = 0;
   virtual bool theater_exists(int theater_id) const = 0;
   
-  virtual void schedule_movie_in_theater(int theater_id, const Movie& movie) = 0;
+  virtual void schedule_movie_in_theater(int theater_id, Movie&& movie) = 0;
   virtual void remove_movie_from_theater(int theater_id, int movie_id) = 0;
   virtual void set_theater_capacity(int theater_id, int capacity) = 0;
 };

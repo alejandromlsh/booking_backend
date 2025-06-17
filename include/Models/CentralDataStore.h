@@ -22,7 +22,7 @@ public:
   CentralDataStore() = default;
   ~CentralDataStore() = default;
   
-  void add_movie(const Movie& movie) override;
+  void add_movie(Movie&& movie) override;
   void remove_movie(int movie_id) override;
   Movie get_movie(int movie_id) const override;
   std::vector<Movie> get_all_movies() const override;

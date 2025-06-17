@@ -60,7 +60,7 @@ TEST(TheaterTest, ConstructorAndGetters) {
 TEST(TheaterTest, AddMovieAndInitializeSeats) {
   Theater t(2, "Indie Cinema");
   Movie m(77, "Arrival");
-  t.add_movie(m);
+  t.add_movie(std::move(m));
   auto seats = t.get_available_seats(m.get_id());
   EXPECT_EQ(seats.size(), 20); // Still 20 total seats
   
@@ -80,7 +80,7 @@ TEST(TheaterTest, AddMovieAndInitializeSeats) {
 TEST(TheaterTest, BookSeatsSuccess) {
   Theater t(3, "SciFi Cinema");
   Movie m(55, "Dune");
-  t.add_movie(m);
+  t.add_movie(Movie(m));
   std::vector<std::string> to_book = {"a1", "b2"};
   EXPECT_TRUE(t.book_seats(m.get_id(), to_book));
   auto available = t.get_available_seats(m.get_id());
@@ -90,7 +90,7 @@ TEST(TheaterTest, BookSeatsSuccess) {
 TEST(TheaterTest, BookSeatsFailureAlreadyBooked) {
   Theater t(4, "Classic Cinema");
   Movie m(88, "Casablanca");
-  t.add_movie(m);
+  t.add_movie(Movie(m));
   std::vector<std::string> to_book = {"a1", "a2"};
   EXPECT_TRUE(t.book_seats(m.get_id(), to_book));
   // Try booking again
@@ -100,7 +100,7 @@ TEST(TheaterTest, BookSeatsFailureAlreadyBooked) {
 TEST(TheaterTest, BookSeatsFailureNonExistentSeat) {
   Theater t(5, "Tiny Cinema");
   Movie m(99, "Short Film");
-  t.add_movie(m);
+  t.add_movie(Movie(m));
   EXPECT_FALSE(t.book_seats(m.get_id(), {"f1"})); // f1 doesn't exist in 5x4 grid
 }
 
@@ -108,10 +108,10 @@ TEST(TheaterTest, ShowsMovie) {
   Theater t(6, "Test Cinema");
   Movie m1(1, "Movie1");
   Movie m2(2, "Movie2");
-  t.add_movie(m1);
+  t.add_movie(std::move(m1));
   EXPECT_TRUE(t.shows_movie(1));
   EXPECT_FALSE(t.shows_movie(2));
-  t.add_movie(m2);
+  t.add_movie(std::move(m2));
   EXPECT_TRUE(t.shows_movie(2));
 }
 
@@ -122,8 +122,8 @@ TEST(AdministrationServiceTest, AddMovieAndGetAllMovies) {
   
   Movie m1(1, "Inception");
   Movie m2(2, "Matrix");
-  admin_svc.add_movie(m1);
-  admin_svc.add_movie(m2);
+  admin_svc.add_movie(std::move(m1));
+  admin_svc.add_movie(std::move(m2));
   
   auto movies = admin_svc.get_all_movies();
   ASSERT_EQ(movies.size(), 2);
@@ -136,10 +136,10 @@ TEST(AdministrationServiceTest, AddTheaterAndManagement) {
   AdministrationService admin_svc(data_store);
   
   Movie m(1, "Interstellar");
-  admin_svc.add_movie(m);
+  admin_svc.add_movie(Movie(m));
   
   auto t = std::make_shared<Theater>(10, "CinemaX");
-  t->add_movie(m);
+  t->add_movie(std::move(m));
   admin_svc.add_theater(t);
   
   auto theaters = admin_svc.get_all_theaters();
@@ -156,8 +156,8 @@ TEST(BookingServiceTest, GetAllMoviesReadOnly) {
   // Add movies through administration service
   Movie m1(1, "Inception");
   Movie m2(2, "Matrix");
-  admin_svc.add_movie(m1);
-  admin_svc.add_movie(m2);
+  admin_svc.add_movie(std::move(m1));
+  admin_svc.add_movie(std::move(m2));
   
   // Access movies through booking service
   auto movies = booking_svc.get_all_movies();
@@ -172,10 +172,10 @@ TEST(BookingServiceTest, GetTheatersShowingMovie) {
   BookingService booking_svc(data_store);
   
   Movie m(1, "Interstellar");
-  admin_svc.add_movie(m);
+  admin_svc.add_movie(Movie(m));
   
   auto t = std::make_shared<Theater>(10, "CinemaX");
-  t->add_movie(m);
+  t->add_movie(std::move(m));
   admin_svc.add_theater(t);
   
   auto theaters = booking_svc.get_theaters_showing_movie(1);
@@ -189,10 +189,10 @@ TEST(BookingServiceTest, GetAvailableSeats) {
   BookingService booking_svc(data_store);
   
   Movie m(1, "Tenet");
-  admin_svc.add_movie(m);
+  admin_svc.add_movie(Movie(m));
   
   auto t = std::make_shared<Theater>(20, "CinemaY");
-  t->add_movie(m);
+  t->add_movie(std::move(m));
   admin_svc.add_theater(t);
   
   auto seats = booking_svc.get_available_seats(20, 1);
@@ -205,10 +205,10 @@ TEST(BookingServiceTest, BookSeatsSuccessAndFailure) {
   BookingService booking_svc(data_store);
   
   Movie m(1, "Dune");
-  admin_svc.add_movie(m);
+  admin_svc.add_movie(Movie(m));
   
   auto t = std::make_shared<Theater>(30, "CinemaZ");
-  t->add_movie(m);
+  t->add_movie(std::move(m));
   admin_svc.add_theater(t);
   
   // Book valid seats
@@ -265,7 +265,7 @@ TEST(SeatTest, ConcurrentBookingRaceCondition) {
 TEST(TheaterTest, ConcurrentSeatBookingStressTest) {
   Theater theater(1, "Stress Test Cinema");
   Movie movie(1, "Concurrent Movie");
-  theater.add_movie(movie);
+  theater.add_movie(Movie(movie));
   
   const int num_threads = 20;
   std::vector<std::future<bool>> futures;
@@ -314,7 +314,7 @@ TEST(TheaterTest, ConcurrentSeatBookingStressTest) {
 TEST(TheaterTest, ConcurrentSameSeatBookingConflict) {
   Theater theater(2, "Conflict Test Cinema");
   Movie movie(2, "Conflict Movie");
-  theater.add_movie(movie);
+  theater.add_movie(Movie(movie));
   
   const int num_threads = 50;
   std::vector<std::future<bool>> futures;
@@ -351,10 +351,10 @@ TEST(BookingServiceTest, ConcurrentServiceOperations) {
   BookingService booking_svc(data_store);
   
   Movie movie(1, "Service Test Movie");
-  admin_svc.add_movie(movie);
+  admin_svc.add_movie(Movie(movie));
   
   auto theater = std::make_shared<Theater>(1, "Service Test Theater");
-  theater->add_movie(movie);
+  theater->add_movie(std::move(movie));
   admin_svc.add_theater(theater);
   
   const int num_threads = 30;
