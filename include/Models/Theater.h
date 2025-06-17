@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include <unordered_map>
+#include <map>
 #include <memory>
 #include <mutex>
 #include "Seat.h"
@@ -27,7 +28,8 @@ private:
   int seat_count_ = 20;
   std::string name_;
   std::vector<Movie> movies_;
-  std::unordered_map<int, std::unordered_map<std::string, std::shared_ptr<Seat>>> seats_per_movie_;
+  //std::unordered_map<int, std::unordered_map<std::string, std::shared_ptr<Seat>>> seats_per_movie_;
+  std::unordered_map<int, std::map<std::string, std::shared_ptr<Seat>>> seats_per_movie_; // Important for order in the responses
   mutable std::mutex mtx_;
 
 
