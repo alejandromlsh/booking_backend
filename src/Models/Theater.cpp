@@ -1,4 +1,5 @@
 #include "Models/Theater.h"
+#include "Models/Seat.h"
 #include <cmath>
 
 Theater::Theater(int id, const std::string& name) : id_(id), name_(name) {}

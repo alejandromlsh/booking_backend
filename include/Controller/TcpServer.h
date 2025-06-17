@@ -46,7 +46,7 @@ public:
    * @throws std::runtime_error if port binding fails or socket configuration errors occur
    */
   TcpServer(boost::asio::io_context& io_context, unsigned short port,
-            BookingService& booking_service, AdministrationService& admin_service,
+            IBookingService& booking_service, IAdministrationService& admin_service,
             std::size_t thread_pool_size);
 
   /**
@@ -108,8 +108,8 @@ private:
   json::value get_sample_format();
 
   boost::asio::ip::tcp::acceptor acceptor_;  ///< TCP acceptor for incoming connections
-  BookingService& booking_service_;          ///< Reference to booking service for seat operations
-  AdministrationService& admin_service_;     ///< Reference to administration service for system management
+  IBookingService& booking_service_;          ///< Reference to booking service for seat operations
+  IAdministrationService& admin_service_;     ///< Reference to administration service for system management
   std::size_t threadpool_size_;              ///< Number of threads in the worker thread pool
   ThreadPool thread_pool_;                   ///< Thread pool for concurrent client session handling
 };

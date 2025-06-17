@@ -1,14 +1,14 @@
 #include "Models/CentralDataStore.h"
 #include <algorithm>
+#include <mutex>
 
 void CentralDataStore::add_movie(const Movie& movie) {
-  std::scoped_lock<std::shared_mutex> lock(data_mutex_);
-  //movies_[movie.get_id()] = movie;
+  std::unique_lock<std::shared_mutex> lock(data_mutex_);
   movies_.insert_or_assign(movie.get_id(), movie);
 }
 
 void CentralDataStore::remove_movie(int movie_id) {
-  std::scoped_lock<std::shared_mutex> lock(data_mutex_);
+  std::unique_lock<std::shared_mutex> lock(data_mutex_);
   movies_.erase(movie_id);
 }
 
@@ -25,16 +25,12 @@ std::vector<Movie> CentralDataStore::get_all_movies() const {
   std::shared_lock<std::shared_mutex> lock(data_mutex_);
   std::vector<Movie> result;
   result.reserve(movies_.size());
-  
-  // Sort by ID to ensure consistent ordering
   std::vector<std::pair<int, Movie>> sorted_movies;
   for (const auto& pair : movies_) {
     sorted_movies.push_back(pair);
   }
-  
   std::sort(sorted_movies.begin(), sorted_movies.end(),
-            [](const auto& a, const auto& b) { return a.first < b.first; });
-  
+    [](const auto& a, const auto& b) { return a.first < b.first; });
   for (const auto& pair : sorted_movies) {
     result.push_back(pair.second);
   }
@@ -46,17 +42,17 @@ bool CentralDataStore::movie_exists(int movie_id) const {
   return movies_.find(movie_id) != movies_.end();
 }
 
-void CentralDataStore::add_theater(const std::shared_ptr<Theater>& theater) {
-  std::scoped_lock<std::shared_mutex> lock(data_mutex_);
+void CentralDataStore::add_theater(std::shared_ptr<ITheater> theater) {
+  std::unique_lock<std::shared_mutex> lock(data_mutex_);
   theaters_[theater->get_id()] = theater;
 }
 
 void CentralDataStore::remove_theater(int theater_id) {
-  std::scoped_lock<std::shared_mutex> lock(data_mutex_);
+  std::unique_lock<std::shared_mutex> lock(data_mutex_);
   theaters_.erase(theater_id);
 }
 
-std::shared_ptr<Theater> CentralDataStore::get_theater(int theater_id) const {
+std::shared_ptr<ITheater> CentralDataStore::get_theater(int theater_id) const {
   std::shared_lock<std::shared_mutex> lock(data_mutex_);
   auto it = theaters_.find(theater_id);
   if (it != theaters_.end()) {
@@ -65,9 +61,9 @@ std::shared_ptr<Theater> CentralDataStore::get_theater(int theater_id) const {
   return nullptr;
 }
 
-std::vector<std::shared_ptr<Theater>> CentralDataStore::get_all_theaters() const {
+std::vector<std::shared_ptr<ITheater>> CentralDataStore::get_all_theaters() const {
   std::shared_lock<std::shared_mutex> lock(data_mutex_);
-  std::vector<std::shared_ptr<Theater>> result;
+  std::vector<std::shared_ptr<ITheater>> result;
   result.reserve(theaters_.size());
   for (const auto& pair : theaters_) {
     result.push_back(pair.second);
@@ -75,9 +71,9 @@ std::vector<std::shared_ptr<Theater>> CentralDataStore::get_all_theaters() const
   return result;
 }
 
-std::vector<std::shared_ptr<Theater>> CentralDataStore::get_theaters_showing_movie(int movie_id) const {
+std::vector<std::shared_ptr<ITheater>> CentralDataStore::get_theaters_showing_movie(int movie_id) const {
   std::shared_lock<std::shared_mutex> lock(data_mutex_);
-  std::vector<std::shared_ptr<Theater>> result;
+  std::vector<std::shared_ptr<ITheater>> result;
   for (const auto& pair : theaters_) {
     if (pair.second->shows_movie(movie_id)) {
       result.push_back(pair.second);
